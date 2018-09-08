@@ -1,5 +1,7 @@
 package com.jastrzab.domain;
 
+import com.jastrzab.domain.model.GameStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,5 +21,36 @@ public class HangmanGameService {
         }
 
         return result;
+    }
+
+    public GameStatus createGamesStatus(String name , String phrase){
+        return new GameStatus(name,phrase);
+    }
+
+    public void processNextLetter(char letter, GameStatus gamesStatus) {
+
+
+        if( gamesStatus.getHistory().contains(letter)){
+            gamesStatus.incrementFailureCounter();
+        }else {
+
+            final String phrase = gamesStatus.getPhrase();
+            final List<Integer> letterIds = this.performCharacter(letter, phrase);
+            letterIds.forEach((index)->{
+                gamesStatus.getPhraseState()[index] = gamesStatus.getPhrase().charAt(index);
+            });
+            pronouncement(gamesStatus, (letterIds.size()>0));
+            gamesStatus.getHistory().add(letter);
+        }
+
+
+    }
+
+    private void pronouncement(GameStatus gamesStatus, boolean succes) {
+        if(succes){
+            gamesStatus.incrementSuccessCounter();;
+        }else {
+            gamesStatus.incrementFailureCounter();
+        }
     }
 }
